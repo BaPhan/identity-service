@@ -1,0 +1,22 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /profile
+spring:
+  application:
+    name: profile-service
+  data:
+    mongodb:
+      uri: mongodb://root:root@localhost:27017/profile-service?authSource=admin
+
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/books_baphan_dev
+idp:
+  url: http://localhost:8180
+keycloak:
+  client-id: dev_books
+  client-secret: erK2OSAr4ogyRrRWjJjkpqXp65C8wrp1

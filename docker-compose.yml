@@ -1,0 +1,49 @@
+version: '3.9'
+
+services:
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    command: ["--auth"]
+    volumes:
+      - mongodb_data:/data/db
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0.0
+    container_name: keycloak
+    ports:
+      - "8180:8080"
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    command: ["start-dev"]
+    depends_on:
+      - mongodb
+
+  profile-service:
+    build:
+      context: .
+    container_name: profile-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongodb
+      - keycloak
+    environment:
+      SPRING_APPLICATION_NAME: profile-service
+      SPRING_DATA_MONGODB_URI: mongodb://root:root@mongodb:27017/profile-service?authSource=admin
+      SERVER_PORT: 8080
+      SERVER_CONTEXT_PATH: /profile
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/books_baphan_dev
+      IDP_URL: http://keycloak:8080
+      KEYCLOAK_CLIENT_ID: dev_books
+      KEYCLOAK_CLIENT_SECRET: erK2OSAr4ogyRrRWjJjkpqXp65C8wrp1
+
+volumes:
+  mongodb_data:
