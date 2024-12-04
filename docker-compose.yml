@@ -13,6 +13,8 @@ services:
     command: ["--auth"]
     volumes:
       - mongodb_data:/data/db
+    networks:
+      - app-network
 
   keycloak:
     image: quay.io/keycloak/keycloak:25.0.0
@@ -25,6 +27,8 @@ services:
     command: ["start-dev"]
     depends_on:
       - mongodb
+    networks:
+      - app-network
 
   profile-service:
     build:
@@ -44,6 +48,12 @@ services:
       IDP_URL: http://keycloak:8080
       KEYCLOAK_CLIENT_ID: dev_books
       KEYCLOAK_CLIENT_SECRET: erK2OSAr4ogyRrRWjJjkpqXp65C8wrp1
+    networks:
+      - app-network
 
 volumes:
   mongodb_data:
+
+networks:
+  app-network:
+    driver: bridge
